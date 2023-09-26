@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import cv2 as cv
@@ -11,11 +12,11 @@ def on_mouse(event, x, y, flags, param):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print('[USAGE] python3 mouse_click_example.py [IMAGE PATH]')
-        sys.exit(1)
+    # if len(sys.argv) < 2:
+    #     print('[USAGE] python3 mouse_click_example.py [IMAGE PATH]')
+    #     sys.exit(1)
 
-    img = cv.imread(sys.argv[1])
+    img = cv.imread(os.path.join("images", "1-0.png"))
 
     points_add= []
     cv.namedWindow(WINDOW_NAME)
@@ -33,5 +34,6 @@ if __name__ == '__main__':
     cv.destroyAllWindows()
     
     print('{} Points added'.format(len(points_add)))
+    print(points_add)
 
 

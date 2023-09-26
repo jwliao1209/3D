@@ -1,6 +1,11 @@
+import os
 import sys
 import numpy as np
 import cv2 as cv
+
+from src.direct_linear_transform import NormalizedDLT
+from src.error import compute_error
+
 
 def get_sift_correspondences(img1, img2):
     '''
@@ -29,8 +34,9 @@ def get_sift_correspondences(img1, img2):
     points2 = np.array([kp2[m.trainIdx].pt for m in good_matches])
     
     img_draw_match = cv.drawMatches(img1, kp1, img2, kp2, good_matches, None, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    cv.imshow('match', img_draw_match)
-    cv.waitKey(0)
+    # cv.imshow('match', img_draw_match)
+    # cv.waitKey(0)
+
     return points1, points2
 
 
@@ -38,7 +44,13 @@ if __name__ == '__main__':
     img1 = cv.imread(sys.argv[1])
     img2 = cv.imread(sys.argv[2])
     gt_correspondences = np.load(sys.argv[3])
-    
     points1, points2 = get_sift_correspondences(img1, img2)
-    
-    
+
+    for k in [4, 8, 20]:
+        r, c, _ = img1.shape
+        dlt = NormalizedDLT()
+        dlt.estimate_norm_matrix(r, c)
+        dlt.estimate_homography(points1[:k], points2[:k])
+        points1_target = dlt.transform(gt_correspondences[0])
+        error = compute_error(points1_target, gt_correspondences[1])
+        print('error', error)
