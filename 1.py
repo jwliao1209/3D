@@ -6,9 +6,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from src.sift import get_sift_correspondences
-from src.direct_linear_transform import NormalizedDLT
+from src.transform import DLT, NormalizedDLT, RANSAC
 from src.utils import remove_outlier_feature_points, plot_figure
-from src.error import compute_error
 
 
 if __name__ == '__main__':
@@ -19,23 +18,32 @@ if __name__ == '__main__':
     points1, points2, kp1, kp2, good_matches = get_sift_correspondences(img1, img2)
     remove_outlier_index = remove_outlier_feature_points(points1, points2, threshold=0.5, kdeplot=False)
 
-    for k in [4, 8, 20, 25]:
-        for normalize in [False, True]:
-            print(f"---------- k={k} ----------")
-            selected_index = remove_outlier_index[:k]
-            selected_good_matches = [good_matches[i] for i in selected_index]
+    for k in [4, 8, 20]:
+        for use_normalize in [False, True]:
+            for use_ransac in [False, True]:
+                
+                selected_index = remove_outlier_index[:k]
+                selected_good_matches = [good_matches[i] for i in selected_index]
 
-            r, c, _ = img1.shape
-            dlt = NormalizedDLT()
+                if use_ransac:
+                    print(f"==========  {k} points DLT + RANSEC ==========")
+                    ransac = RANSAC(k, 5000, 5, "dlt")
+                    ransac.estimate(points1, points2)
+                    error = ransac.get_error(gt_correspondences[0], gt_correspondences[1])
 
-            if normalize:
-                dlt.estimate_norm_matrix(c, r)
+                else:
+                    if use_normalize:
+                        print(f"========== {k} points Normalized DLT ==========")
+                        dlt = NormalizedDLT()
+                    else:
+                        print(f"========== {k} points DLT ==========")
+                        dlt = DLT()
 
-            dlt.estimate_homography(points1[selected_index, :], points2[selected_index, :])
-            error = dlt.compute_error(gt_correspondences[0], gt_correspondences[1])
+                    dlt.estimate(points1[selected_index, :], points2[selected_index, :])
+                    error = dlt.get_error(gt_correspondences[0], gt_correspondences[1])
 
-            print("Error:", error)
-            plot_figure(
-                img1, kp1, img2, kp2, selected_good_matches,
-                os.path.join("outputs", f"k={k}_norm={normalize}.png")
-            )
+                print(f"Error of ground truth: {error}\n")
+                    # plot_figure(
+                    #     img1, kp1, img2, kp2, selected_good_matches,
+                    #     os.path.join("outputs", f"k={k}_norm={normalize}.png")
+                    # )

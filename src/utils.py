@@ -2,11 +2,22 @@ import cv2 as cv
 import numpy as np
 import seaborn as sns
 
+from src.constants import RANDOM_SEED, EPSILON
 
-EPSILON = 1e-8
+
+def fix_random_seed(seed=RANDOM_SEED):
+    def decorator(func):
+        def wrap(*args, **kargs):
+            np.random.seed(seed)
+            func(*args, **kargs)
+        return wrap
+    return decorator
 
 
-def remove_outlier_feature_points(points1, points2, threshold, kdeplot=False, save_name="output.png"):
+def remove_outlier_feature_points(
+        points1, points2, threshold,
+        kdeplot=False, save_name="output.png"
+    ):
     vec12 = points1 - points2
     slope = (vec12[:, 1] + EPSILON) / (vec12[:, 0] + EPSILON)
     score = np.abs((slope-np.median(slope)) / (np.std(slope) + EPSILON))

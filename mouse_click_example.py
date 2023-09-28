@@ -16,9 +16,9 @@ if __name__ == '__main__':
     #     print('[USAGE] python3 mouse_click_example.py [IMAGE PATH]')
     #     sys.exit(1)
 
-    img = cv.imread(os.path.join("images", "1-0.png"))
+    img = cv.imread(os.path.join("images", "citi.png"))
 
-    points_add= []
+    points_add = []
     cv.namedWindow(WINDOW_NAME)
     cv.setMouseCallback(WINDOW_NAME, on_mouse, [points_add])
     while True:
@@ -34,6 +34,4 @@ if __name__ == '__main__':
     cv.destroyAllWindows()
     
     print('{} Points added'.format(len(points_add)))
-    print(points_add)
-
-
+    print(np.array(points_add)[:, [1,0]])
