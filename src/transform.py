@@ -146,8 +146,13 @@ class RANSAC(Base3DTransform):
 
             if (inlier_errors < best_inlier_error) and (inlier_num > 20):
                 best_inlier_error = inlier_errors
+                best_index = index
                 best_dlt = copy(dlt)
 
         self.update(best_dlt.matrix)
+        self.best_index = best_index
         # print(best_dlt.homography.get_condition_number())
         return
+    
+    def get_good_matches(self, good_matches):
+        return [good_matches[i] for i in self.best_index]

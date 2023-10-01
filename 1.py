@@ -4,12 +4,10 @@ import argparse
 import cv2 as cv
 import numpy as np
 
-from itertools import product
-
 from src.constants import SAVE_DIR
 from src.sift import get_sift_correspondences
 from src.transform import DLT, NormalizedDLT, RANSAC
-from src.utils import remove_outlier, plot_matching_figure
+from src.utils import get_params_grids, remove_outlier, plot_matching_figure
 
 
 PARAMS = {
@@ -20,11 +18,6 @@ PARAMS = {
 }
 
 REMOVE_OUTLIER_THRES = 0.1
-
-def get_params_grids(params):
-    keys = params.keys()
-    params_grids = product(*params.values())
-    return [dict(zip(keys, items)) for items in params_grids]
 
 
 def parse_arguments():
@@ -75,11 +68,14 @@ if __name__ == "__main__":
             ransac = RANSAC(k, iters=args.ransac_iteration, threshold=args.ransac_threshold, norm=use_normalize)
             ransac.estimate(points1, points2)
             error = ransac.get_error(gt_correspondences[0], gt_correspondences[1])
+            good_matches = ransac.get_good_matches(good_matches)
+
 
         else:
             dlt = NormalizedDLT() if use_normalize else DLT()
             dlt.estimate(points1[:k, :], points2[:k, :])
             error = dlt.get_error(gt_correspondences[0], gt_correspondences[1])
+            good_matches = good_matches[:k]
 
         plot_matching_figure(
             img1, kp1, img2, kp2, good_matches,

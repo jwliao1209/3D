@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import seaborn as sns
 
+from itertools import product
 from src.constants import RANDOM_SEED, EPSILON
 
 
@@ -12,6 +13,12 @@ def fix_random_seed(seed=RANDOM_SEED):
             func(*args, **kargs)
         return wrap
     return decorator
+
+
+def get_params_grids(params):
+    keys = params.keys()
+    params_grids = product(*params.values())
+    return [dict(zip(keys, items)) for items in params_grids]
 
 
 def remove_outlier(points1, points2, good_matches, threshold=0.5, kdeplot=False, save_name="output.png"):
