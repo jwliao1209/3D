@@ -45,3 +45,4 @@ if __name__ == "__main__":
     if args.display:
         cv.imshow("backward_interpolation", target_image)
         cv.waitKey(0)
+    print(np.__version__)
