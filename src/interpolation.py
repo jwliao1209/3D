@@ -3,7 +3,7 @@ import numpy as np
 from src.constants import EPSILON
 
 
-def backward_bilinear_interpolate(coordinates, image, row, col):
+def backward_bilinear_interpolate(coordinates, image, height, width):
     lu_coor = np.floor(coordinates).astype(int)
     ld_coor = lu_coor + np.array([1, 0])
     ru_coor = lu_coor + np.array([0, 1])
@@ -28,4 +28,4 @@ def backward_bilinear_interpolate(coordinates, image, row, col):
 
     target_image = w11 * lu_pixel + w21 * ld_pixel +  w12 * ru_pixel + w22 * rd_pixel
 
-    return target_image.reshape(row, col, 3).astype(np.uint8)
+    return target_image.reshape(height, width, 3).astype(np.uint8)

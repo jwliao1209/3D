@@ -1,2 +1,3 @@
 RANDOM_SEED = 10
 EPSILON = 1e-8
+SAVE_DIR = "outputs"

@@ -2,10 +2,19 @@ import numpy as np
 
 from copy import copy
 
-from src.coordinate_transform import to_3d, to_2d
 from src.error import compute_error
 from src.utils import fix_random_seed
 from src.constants import EPSILON
+
+
+def to_3d(points_2d):
+    num, _ = points_2d.shape
+    return np.hstack([points_2d, np.ones((num, 1))])
+
+
+def to_2d(points_3d):
+    points_3d = points_3d / (np.expand_dims(points_3d[:, 2], axis=1) + EPSILON)
+    return points_3d[:, :2]
 
 
 class Base3DTransform:
@@ -89,6 +98,7 @@ class DLT(Base3DTransform):
     def estimate(self, points1, points2):
         self.homography.estimate(points1, points2)
         self.update(self.homography.matrix)
+        # print(self.homography.get_condition_number())
         return
 
 
@@ -107,21 +117,22 @@ class NormalizedDLT(Base3DTransform):
         self.homography.estimate(points1_norm, points2_norm)
         matrix = self.normalize.inverse_matrix @ self.homography.matrix @ self.normalize.matrix
         self.update(matrix)
+        # print(self.homography.get_condition_number())
         return
 
 
 class RANSAC(Base3DTransform):
-    def __init__(self, point_num, iters, threshold, method="dlt"):
+    def __init__(self, point_num, iters, threshold, norm=False):
         self.point_num = point_num
         self.iters = iters
         self.threshold = threshold
-        self.method = method
+        self.norm = norm
 
     @fix_random_seed()
     def estimate(self, points1, points2):
         best_inlier_error = np.Inf
         for _ in range(self.iters):
-            dlt = DLT() if self.method == "dlt" else NormalizedDLT()
+            dlt = NormalizedDLT() if self.norm else DLT()
             try:
                 index = np.random.randint(points1.shape[0], size=(self.point_num,))
                 dlt.estimate(points1[index], points2[index])
