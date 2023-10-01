@@ -1,7 +1,6 @@
 import numpy as np
 
 from copy import copy
-
 from src.error import compute_error
 from src.utils import fix_random_seed
 from src.constants import EPSILON

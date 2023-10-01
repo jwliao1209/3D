@@ -1,4 +1,5 @@
 import os
+import time
 import argparse
 import cv2 as cv
 import numpy as np
@@ -29,13 +30,16 @@ if __name__ == "__main__":
     height, width = source_points[3] - source_points[0]
     target_points = np.array([[0, 0], [height, 0], [0, width], [height, width]])
 
+    start_time = time.time()
     dlt = DLT()
     dlt.estimate(source_points, target_points)
     target_points = dlt.transform(source_points)
     target_coordinates = generate_grid_points(height, width)
     source_coordinates = dlt.inverse_transform(target_coordinates)
     target_image = backward_bilinear_interpolate(source_coordinates, image, height, width)
+    end_time = time.time()
 
+    print(f"Spending time: {end_time - start_time}")
     cv.imwrite(os.path.join(SAVE_DIR, args.output_name), target_image)
 
     if args.display:

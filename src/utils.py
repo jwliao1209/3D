@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import seaborn as sns
 
 from itertools import product
 from src.constants import RANDOM_SEED, EPSILON
@@ -32,6 +31,7 @@ def remove_outlier(points1, points2, good_matches, threshold=0.5, kdeplot=False,
     selected_good_matches = [good_matches[i] for i in selected_indices]
 
     if kdeplot:
+        import seaborn as sns
         sns_plot = sns.kdeplot(x=slope)
         sns_plot = sns.kdeplot(x=slope[selected_indices])
         fig = sns_plot.get_figure()
