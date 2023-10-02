@@ -38,11 +38,9 @@ if __name__ == "__main__":
     source_coordinates = dlt.inverse_transform(target_coordinates)
     target_image = backward_bilinear_interpolate(source_coordinates, image, height, width)
     end_time = time.time()
-
-    print(f"Spending time: {end_time - start_time}")
+    print(f"interpolation spending time: {end_time - start_time}")
     cv.imwrite(os.path.join(SAVE_DIR, args.output_name), target_image)
 
     if args.display:
         cv.imshow("backward_interpolation", target_image)
         cv.waitKey(0)
-    print(np.__version__)

@@ -150,7 +150,6 @@ class RANSAC(Base3DTransform):
 
         self.update(best_dlt.matrix)
         self.best_index = best_index
-        # print(best_dlt.homography.get_condition_number())
         return
     
     def get_good_matches(self, good_matches):
