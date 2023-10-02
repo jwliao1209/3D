@@ -42,5 +42,6 @@ if __name__ == "__main__":
     cv.imwrite(os.path.join(SAVE_DIR, args.output_name), target_image)
 
     if args.display:
+        cv.imshow("source image", image)
         cv.imshow("backward_interpolation", target_image)
         cv.waitKey(0)
